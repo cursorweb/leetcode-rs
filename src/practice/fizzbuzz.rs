@@ -1,3 +1,4 @@
+// https://leetcode.com/problems/fizz-buzz/
 pub fn fizzbuzz(max: i32) -> Vec<String> {
     let mut out = Vec::new();
 
