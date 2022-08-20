@@ -71,6 +71,10 @@ fn fun() {
     {
         let v = vec![3, 19, 18, 16, 6, 15, 12, 14, 11, 1];
         let s = format!("{:?}", v);
-        println!("Merge sort: {} -> {:?}", s, mergesort::merge_sort(v))
+        println!("Merge sort: {} -> {:?}", s, mergesort::merge_sort(v));
+
+        let v = vec![15, 18, 16, 4, 10, 10, 12, 11, 15, 16];
+        let s = format!("{:?}", v);
+        println!("Merge sort: {} -> {:?}", s, mergesort::merge_sortf(v, |a: &i32, b: &i32| a < b && (a - b).abs() > 2));
     }
 }
