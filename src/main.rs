@@ -77,4 +77,25 @@ fn fun() {
         let s = format!("{:?}", v);
         println!("Merge sort: {} -> {:?}", s, mergesort::merge_sortf(v, |a: &i32, b: &i32| a < b && (a - b).abs() > 2));
     }
+
+    {
+        let mut parent = dictreq::Environ::new();
+        parent.set("log".into(), 6);
+
+        let mut env = dictreq::Environ::new();
+        env.set("my_var".into(), 5);
+        env.set_enc(parent);
+
+        println!("my_var = {}", env.get(&"my_var".into()).unwrap());
+        println!("log = {}", env.get(&"log".into()).unwrap());
+        println!("null = {:?}", env.get(&"null".into()));
+
+        env.assign("log".into(), 7).unwrap();
+        println!("log = {}", env.get(&"log".into()).unwrap());
+
+        match env.assign("null".into(), 7) {
+            Err(()) => println!("null is undef"),
+            Ok(()) => {}
+        }
+    }
 }
