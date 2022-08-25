@@ -58,6 +58,10 @@ category!(
                 }))
             })
         );
+    },
+    "ransom" => {
+        println!("Make ransom 'you suck' out of 'hello ransom world': {}", ransom::can_construct("you suck".into(), "hello ransom world".into()));
+        println!("Make ransom 'hello' out of 'the bellows': {}", ransom::ransom("hello".into(), "the bellows".into()))
     }
 );
 
