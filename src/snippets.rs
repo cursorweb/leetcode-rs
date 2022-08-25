@@ -62,6 +62,10 @@ category!(
     "ransom" => {
         println!("Make ransom 'you suck' out of 'hello ransom world': {}", ransom::can_construct("you suck".into(), "hello ransom world".into()));
         println!("Make ransom 'hello' out of 'the bellows': {}", ransom::ransom("hello".into(), "the bellows".into()))
+    },
+    "twosum" => {
+        println!("[3, 2, 4] (6): {:?}", twosum::two_sum(vec![3, 2, 4], 6));
+        println!("[-1, -2, -3, -4, -5] (-9): {:?}", twosum::two_sum(vec![-1, -2, -3, -4, -5], -9));
     }
 );
 
