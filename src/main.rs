@@ -1,101 +1,117 @@
 mod fun;
 mod practice;
+mod snippets;
 
-use fun::*;
-use practice::*;
-
-use invert_tree::Tree;
-use linkedlist::LList;
+use snippets::*;
 
 
-fn main() {
-    practice();
-    fun();
+use std::{env::args, collections::HashMap};
+
+
+#[derive(PartialEq, Debug)]
+enum ArgResult {
+    Help,
+    Snippet(String),
+    Category(String),
+}
+use ArgResult::*;
+
+fn main() -> Result<(), ()> {
+    let args = get_args();
+    let mut funcs = HashMap::new();
+    let categories = HashMap::from([practice(&mut funcs), fun(&mut funcs)]);
+
+    if args.len() == 0 {
+        for (name, func) in funcs {
+            run_func(&name, func);
+        }
+    } else {
+        for arg in args {
+            if arg == Help {
+                println!(
+                    "Syntax: beta [-opts]+
+-h          \tShows this message
+-c[category]\tExecutes all snippets of category [category]
+[name]      \tExecutes snippet [name]
+
+Categories:
+{}",
+                    categories
+                        .iter()
+                        .map(|(name, names)| format!(
+                            "\t{}\n{}",
+                            name,
+                            names
+                                .iter()
+                                .map(|n| format!("\t\t{}", n))
+                                .collect::<Vec<_>>()
+                                .join("\n")
+                        ))
+                        .collect::<Vec<_>>()
+                        .join("\n"),
+                );
+                return Ok(());
+            } else if let Snippet(ref name) = arg {
+                if funcs.contains_key(name) {
+                    run_func(name, funcs[name]);
+                } else {
+                    return Err(println!(
+                        "Unknown snippet '{}'.
+Valid Snippets:
+{}",
+                        name,
+                        funcs
+                            .keys()
+                            .map(|k| format!("\t{}", k))
+                            .collect::<Vec<_>>()
+                            .join("\n")
+                    ));
+                }
+            } else if let Category(ref category) = arg {
+                if categories.contains_key(category) {
+                    for name in &categories[category] {
+                        run_func(name, funcs[name]);
+                    }
+                } else {
+                    return Err(println!(
+                        "Unknown category '{}'.
+Valid Categories:
+{}",
+                        category,
+                        categories
+                            .keys()
+                            .map(|k| format!("\t{}", k))
+                            .collect::<Vec<_>>()
+                            .join("\n")
+                    ));
+                }
+            }
+        }
+    }
+
+    Ok(())
 }
 
-fn practice() {
-    println!("Paths(4, 5): {}", paths::paths(4, 5));
-    println!("Fizzbuzz(15): {:?}", fizzbuzz::fizzbuzz(15));
-    println!(
-        "Invert_Tree({}) {:?}",
-        "{5: {6: {7, 8}, 7}}",
-        invert_tree::invert_tree(Tree {
-            val: 5,
-            left: Some(Box::new(Tree {
-                val: 6,
-                left: Some(Box::new(Tree {
-                    val: 7,
-                    left: None,
-                    right: None
-                })),
-                right: Some(Box::new(Tree {
-                    val: 8,
-                    left: None,
-                    right: None
-                }))
-            })),
-            right: Some(Box::new(Tree {
-                val: 7,
-                left: None,
-                right: None
-            }))
-        })
-    );
+fn get_args() -> Vec<ArgResult> {
+    let args = args().into_iter().skip(1);
+    if args.len() == 0 {
+        return Vec::new();
+    }
+
+    args.map(|s| {
+        if s == "-h" || s == "--help" {
+            Help
+        } else if s.starts_with("-c") {
+            Category(s[2..].into())
+        } else {
+            Snippet(s)
+        }
+    })
+    .collect()
 }
 
-fn fun() {
-    {
-        let mut llist = LList::new(5);
-        llist.append(6);
-        llist.append(7);
-        llist.append(8);
-
-        print!("[ ");
-        for x in llist {
-            print!("{} ", x);
-        }
-        print!("]\n");
-
-        let mut llist = LList::from_vec(vec![1, 2, 3, 4, 5, 6, 7, 8]);
-        llist.delete(8).unwrap();
-        llist.set(0, 0).unwrap();
-        println!("[0]: {}", llist.get(0).unwrap());
-
-        print!("[ ");
-        for x in llist {
-            print!("{} ", x);
-        }
-        print!("]\n");
-    }
-
-    {
-        let v = vec![3, 19, 18, 16, 6, 15, 12, 14, 11, 1];
-        let s = format!("{:?}", v);
-        println!("Merge sort: {} -> {:?}", s, mergesort::merge_sort(v));
-
-        let v = vec![15, 18, 16, 4, 10, 10, 12, 11, 15, 16];
-        let s = format!("{:?}", v);
-        println!("Merge sort: {} -> {:?}", s, mergesort::merge_sortf(v, |a: &i32, b: &i32| a < b && (a - b).abs() > 2));
-    }
-
-    {
-        let mut parent = dictreq::Environ::new();
-        parent.set("log".into(), 6);
-
-        let mut env = dictreq::Environ::new();
-        env.set("my_var".into(), 5);
-        env.set_enc(parent);
-
-        println!("my_var = {}", env.get(&"my_var".into()).unwrap());
-        println!("log = {}", env.get(&"log".into()).unwrap());
-        println!("null = {:?}", env.get(&"null".into()));
-
-        env.assign("log".into(), 7).unwrap();
-        println!("log = {}", env.get(&"log".into()).unwrap());
-
-        match env.assign("null".into(), 7) {
-            Err(()) => println!("null is undef"),
-            Ok(()) => {}
-        }
-    }
+fn run_func(name: &String, func: fn()) {
+    println!("\n\nExecuting [{}]", name);
+    func();
+    println!("Finished: [{}]", name);
 }

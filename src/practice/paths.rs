@@ -20,7 +20,10 @@ fn fact(max: i32) -> i32 {
     out
 }
 
-/*
+pub fn slow_path(height: i32, width: i32) -> i32 {
+    calc_path(0, 0, 0, height, width)
+}
+
 fn calc_path(sum: i32, x: i32, y: i32, height: i32, width: i32) -> i32 {
     if x == width - 1 && y == height - 1 {
         return 1 + sum;
@@ -36,4 +39,3 @@ fn calc_path(sum: i32, x: i32, y: i32, height: i32, width: i32) -> i32 {
 
     out
 }
-*/
