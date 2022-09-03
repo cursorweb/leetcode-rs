@@ -21,7 +21,6 @@ macro_rules! category {
     };
 }
 
-
 category!(
     practice,
     "paths" => {
@@ -127,5 +126,26 @@ category!(
             Err(()) => println!("null is undef"),
             Ok(()) => {}
         }
+    },
+    "finally" => {
+        use finally::Counter;
+        let mut counter = Counter::new();
+
+        loop {
+            match counter.incr() {
+                Ok(v) => println!("x is {v}"),
+                Err(e) => {
+                    println!("'{e}'");
+                    break
+                },
+            }
+        }
+
+        match counter.incr() {
+            Ok(_) => {}
+            Err(_) => {}
+        }
+
+        println!("Calls: {}", counter.calls);
     }
 );
